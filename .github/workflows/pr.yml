@@ -25,9 +25,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fx 'export BASE_RETH_NODE_COMMIT=39e30a1fc54c63297850d313a3876e1522a753f3' versions.env
+          grep -Fx 'export BASE_RETH_NODE_COMMIT=71d8ce08c247752d33b7cc7f3b9bb2aa25c0db24' versions.env
           grep -Fx 'export BASE_RETH_NODE_REPO=git@github.com:simjaemun2/base.git' versions.env
-          grep -Fx 'export BASE_RETH_NODE_TAG=v1.2.0-mev' versions.env
+          grep -Fx 'export BASE_RETH_NODE_TAG=v1.2.0-mev.1' versions.env
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
