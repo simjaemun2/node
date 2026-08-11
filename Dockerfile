@@ -36,19 +36,21 @@ WORKDIR /app
 COPY versions.env /tmp/versions.env
 
 RUN --mount=type=secret,id=base_source_ssh_key,required=true \
+    --mount=type=tmpfs,target=/root/.ssh \
     set -eux; \
-    install -d -m 0700 /root/.ssh; \
+    chmod 0700 /root/.ssh; \
+    awk '{ sub(/\r$/, ""); print }' /run/secrets/base_source_ssh_key > /root/.ssh/id_ed25519; \
+    chmod 0600 /root/.ssh/id_ed25519; \
     printf '%s\n' \
       'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' \
       > /root/.ssh/known_hosts; \
     chmod 0600 /root/.ssh/known_hosts; \
     . /tmp/versions.env; \
-    GIT_SSH_COMMAND='ssh -i /run/secrets/base_source_ssh_key -o IdentitiesOnly=yes -o UserKnownHostsFile=/root/.ssh/known_hosts' \
+    GIT_SSH_COMMAND='ssh -i /root/.ssh/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=/root/.ssh/known_hosts' \
       git clone "$BASE_RETH_NODE_REPO" .; \
     git checkout "tags/$BASE_RETH_NODE_TAG"; \
     [ "$(git rev-parse HEAD)" = "$BASE_RETH_NODE_COMMIT" ] || \
-      (echo "Commit hash verification failed" && exit 1); \
-    rm -rf /root/.ssh
+      (echo "Commit hash verification failed" && exit 1)
 
 RUN cargo build --bin base-reth-node --bin base-consensus --bin basectl --profile maxperf
 
