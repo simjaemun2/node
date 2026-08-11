@@ -4,13 +4,10 @@ on:
   push:
     branches:
       - "main"
-    tags:
-      - "v*"
-  workflow_dispatch: {}
 
 env:
   REGISTRY: ghcr.io
-  NAMESPACE: ghcr.io/base
+  NAMESPACE: ghcr.io/simjaemun2
   RETH_IMAGE_NAME: node-reth
 
 permissions:
@@ -65,6 +62,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             FEATURES=${{ matrix.settings.features }}
+          secrets: |
+            "base_source_ssh_key=${{ secrets.BASE_SOURCE_SSH_KEY }}"
           platforms: ${{ matrix.settings.arch }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
